@@ -1,0 +1,41 @@
+version: '3'
+services:
+  nginx:
+    container_name: "nginx"
+    build:
+      context: ./nginx
+    depends_on:
+      - app
+    ports:
+      - 80:80
+    volumes:
+      - ./:/src
+
+  app:
+    container_name: "app"
+    build:
+      context: ./php
+    depends_on:
+      - mysql
+    volumes:
+      - ../app/:/src
+      - /src/node_modules
+      - /src/vendor
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+
+  mysql:
+    image: mysql:8.0.37
+    container_name: "mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 3306:3306
+
+  redis:
+    image: redis:alpine
+    container_name: "redis"
+    ports:
+      - 16379:6379
